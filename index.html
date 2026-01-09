@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Auth System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Voice Deepfake Detector</h1>
+    
+    <div class="container">
+        <h3>Live Analysis</h3>
+        <div id="status">Allow microphone access to begin.</div>
+        <div id="visual-indicator" class="circle"></div>
+    </div>
+
+    <hr>
+
+    <div class="container">
+        <h3>Upload Audio</h3>
+        <input type="file" id="audioUpload" accept="audio/*">
+        <button id="uploadBtn">Check File</button>
+    </div>
+
+    <script type="module" src="main.js"></script>
+    
+    <script>
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            const fileInput = document.getElementById('audioUpload');
+            const statusDiv = document.getElementById('status');
+
+            if(fileInput.files.length === 0) {
+                alert("Please select a file first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            statusDiv.innerText = "Uploading file...";
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                statusDiv.innerText = `File Verdict: ${data.result}`;
+            } catch (error) {
+                statusDiv.innerText = "Error: Backend Offline";
+            }
+        });
+    </script>
+</body>
+</html>
